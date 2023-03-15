@@ -5,6 +5,9 @@ Created on Tue Mar 14 17:10:08 2023
 @author: Sebastian
 """
 
+# You'll need the kaggle library as well
+# make sure you have kaggle credentials:
+# https://github.com/Kaggle/kaggle-api#download-dataset-files
 import os
 from zipfile import ZipFile
 import pandas as pd
