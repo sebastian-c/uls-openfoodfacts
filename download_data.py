@@ -6,7 +6,7 @@ Created on Tue Mar 14 17:10:08 2023
 """
 
 import os
-import zipfile
+from zipfile import ZipFile
 import pandas as pd
 from pathlib import Path
 
@@ -18,10 +18,9 @@ Path(DATA_DIRECTORY).mkdir(parents=True, exist_ok=True)
 
 os.system(f"kaggle datasets download -d openfoodfacts/world-food-facts -p {RAW_DATA_DIR}")
 
-with zipfile.ZipFile("raw_data/world-food-facts.zip", 'r') as zip_ref:
-    zip_ref.extractall("data/")
-
-raw_fooddata = pd.read_table(DATA_DIRECTORY + "en.openfoodfacts.org.products.tsv", encoding="utf-8")
+#Using a zip so we don't have to have a 1GB file on our hard drive
+food_zip = ZipFile(RAW_DATA_DIR + "world-food-facts.zip", 'r')
+raw_fooddata = pd.read_table(food_zip.open("en.openfoodfacts.org.products.tsv"), encoding="utf-8")
 
 ## Important columns
 # categories_tags
@@ -46,5 +45,6 @@ def defineFoodCategory(series):
         return("other")
 
 raw_fooddata.loc[:,"food_category"] = raw_fooddata.categories_tags.apply(defineFoodCategory)
+food_data = raw_fooddata[raw_fooddata.food_category != "other"]
 
-raw_fooddata.to_csv(DATA_DIRECTORY + "food_data.csv", index = False)
+food_data.to_csv(DATA_DIRECTORY + "food_data.csv", index = False)
