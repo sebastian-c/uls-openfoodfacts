@@ -48,6 +48,7 @@ food_data = pd.read_csv(DATA_DIRECTORY + "food_data.csv")
 with(open(DATA_DIRECTORY + "nutrients.txt", "r")) as nutrient_file:
     nutrients = nutrient_file.read().splitlines()
 
+#Choosing not to impute - 1197 rows is ~15%
 XY = food_data[nutrients + ["nutrition_grade_fr"]].dropna()
 
 X = XY[nutrients]
