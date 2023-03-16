@@ -5,25 +5,35 @@ Created on Wed Mar 15 14:21:03 2023
 @author: Sebastian
 """
 
-DATA_DIRECTORY = "data/"
-# %% Import data
-# For suppressing warnings
+import glob
+
+# Plotting
+import seaborn as sb
+from matplotlib import pyplot as plt
+import cv2
+
+# Machine learning 
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import kneighbors_graph
+from sklearn import cluster, mixture
+import pandas as pd
+
+# Notification while models run
+from colorama import Fore, Style
+import datetime as time
 import warnings
 
+DATA_DIRECTORY = "data/"
+OUTPUT_DIRECTORY = "output/"
+# %% Import data
+# For suppressing warnings
+
 # For keeping track of which models have run
-import datetime as time
-from colorama import Fore, Style
 
 # Machine learning
-import pandas as pd
-from sklearn import cluster, mixture
-from sklearn.neighbors import kneighbors_graph
-from sklearn.preprocessing import StandardScaler
 #from sklearn.preprocessing import OrdinalEncoder
 
 # Plotting
-from matplotlib import pyplot as plt
-import seaborn as sb
 
 # %% Read in data
 food_data = pd.read_csv(DATA_DIRECTORY + "food_data.csv")
@@ -47,7 +57,7 @@ Y = XY["nutrition_grade_fr"]
 
 # Does the data naturally cluster into nutriscores?
 
-### Create parameters for clustering
+# Create parameters for clustering
 
 params = {
     "quantile": 0.3,
@@ -75,10 +85,11 @@ connectivity = kneighbors_graph(
 connectivity = 0.5 * (connectivity + connectivity.T)
 
 
-### Create cluster objects
+# Create cluster objects
 
 ms = cluster.MeanShift(bandwidth=bandwidth, bin_seeding=True)
-two_means = cluster.MiniBatchKMeans(n_clusters=params["n_clusters"], n_init="auto")
+two_means = cluster.MiniBatchKMeans(
+    n_clusters=params["n_clusters"], n_init="auto")
 ward = cluster.AgglomerativeClustering(
     n_clusters=params["n_clusters"], linkage="ward", connectivity=connectivity
 )
@@ -123,7 +134,8 @@ clustering_algorithms = (
 algo_dict = {}
 for name, algorithm in clustering_algorithms:
     #t0 = time.time()
-    print("\n[", time.datetime.now(), "]", f"{Fore.RED}****{name}****{Style.RESET_ALL}")
+    print("\n[", time.datetime.now(), "]",
+          f"{Fore.RED}****{name}****{Style.RESET_ALL}")
     # catch warnings related to kneighbors_graph
     with warnings.catch_warnings():
         warnings.filterwarnings(
@@ -146,20 +158,42 @@ for name, algorithm in clustering_algorithms:
         y_pred = algorithm.labels_.astype(int)
     else:
         y_pred = algorithm.predict(X)
-        
-    algo_dict[name] = y_pred
-    
-# %% Examine clusters
-nutriscore_clusters = pd.DataFrame(algo_dict | {"nutriscore" : food_data.loc[Y.index,"nutrition_grade_fr"].array})
 
-mb_crosstab = pd.crosstab(nutriscore_clusters["MiniBatch KMeans"], nutriscore_clusters["nutriscore"])
+    algo_dict[name] = y_pred
+
+# %% Examine clusters
+nutriscore_clusters = pd.DataFrame(
+    algo_dict | {"nutriscore": food_data.loc[Y.index, "nutrition_grade_fr"].array})
+
+mb_crosstab = pd.crosstab(
+    nutriscore_clusters["MiniBatch KMeans"], nutriscore_clusters["nutriscore"])
 
 # sb.heatmap(mb_crosstab, cmap = "Reds")
 # sb.clustermap(mb_crosstab, col_cluster = False, cmap = "Reds")
 # sb.clustermap(mb_crosstab, col_cluster = False, z_score = 1, cmap = "Reds")
 
 for algo in algo_dict.keys():
-    mb_crosstab = pd.crosstab(nutriscore_clusters[algo], nutriscore_clusters["nutriscore"])
-    sb.clustermap(mb_crosstab, col_cluster = False, z_score = 1, cmap = "Reds")
+    mb_crosstab = pd.crosstab(
+        nutriscore_clusters[algo], nutriscore_clusters["nutriscore"])
+    sb.clustermap(mb_crosstab, col_cluster=False, z_score=1, cmap="Reds")
     plt.title(algo)
     
+    plt.savefig(DATA_DIRECTORY + "temp_" + algo + ".png")
+
+im_h1 = list()
+im_h2 = list()
+
+for index,image in enumerate(glob.glob(DATA_DIRECTORY + "temp_*")):
+    if index < 5:
+        im_h1.append(cv2.imread(image))
+    else:
+        im_h2.append(cv2.imread(image))
+        
+img_h1 = cv2.hconcat(im_h1)
+img_h2 = cv2.hconcat(im_h2)
+
+img = cv2.vconcat([img_h1, img_h2])
+
+cv2.imwrite(OUTPUT_DIRECTORY + "cluster_analysis.png", img)
+
+#' So clearly, without training any models on the output data, we can see that nutriscores - at least the gap between ABC and DE form a natural grouping.
