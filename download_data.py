@@ -16,8 +16,10 @@ from pathlib import Path
 
 RAW_DATA_DIR = "raw_data/"
 DATA_DIRECTORY = "data/"
+OUTPUT_DIRECTORY = "output/"
 
 Path(DATA_DIRECTORY).mkdir(parents=True, exist_ok=True)
+Path(OUTPUT_DIRECTORY).mkdir(parents=True, exist_ok=True)
 
 os.system(f"kaggle datasets download -d openfoodfacts/world-food-facts -p {RAW_DATA_DIR}")
 
