@@ -176,7 +176,7 @@ for algo in algo_dict.keys():
     mb_crosstab = pd.crosstab(
         nutriscore_clusters[algo], nutriscore_clusters["nutriscore"])
     sb.clustermap(mb_crosstab, col_cluster=False, z_score=1, cmap="Reds")
-    plt.title(algo)
+    plt.figtext(.5, .9, algo, fontsize = "xx-large")
     
     plt.savefig(DATA_DIRECTORY + "temp_" + algo + ".png")
 
