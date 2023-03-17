@@ -11,8 +11,10 @@ DATA_DIRECTORY = "data/"
 OUTPUT_DIRECTORY = "output/"
 #%% Import libraries
 
+import helpers as hlp
+
 from sklearn import neighbors, svm
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.model_selection import cross_validate, train_test_split
 from sklearn.linear_model import RidgeClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -20,9 +22,7 @@ from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
 
 import glob
-import os
 
-import cv2
 import matplotlib.pyplot as plt
 import seaborn as sb
 
@@ -67,7 +67,8 @@ models = (
     ("Ridge", ridge)
 )
 
-cf_list = {}
+cf_dict = {}
+cfn_dict = {}
 
 for model_name, classifier in models:
     
@@ -92,28 +93,26 @@ for model_name, classifier in models:
     
     print("-- Predicting")
     Y_pred = classifier.predict(X_test)
-    cf_list[model_name] = (confusion_matrix(Y_test, Y_pred))
+    cf_dict[model_name] = confusion_matrix(Y_test, Y_pred)
+    cfn_dict[model_name] = confusion_matrix(Y_test, Y_pred, normalize = 'true')
+    
+
+hlp.collateImages(glob.glob(DATA_DIRECTORY + "temp_class_*"), "classification_analysis.png.png")
+
+for model,cm in cf_dict.items():
+    disp = ConfusionMatrixDisplay(cm, display_labels=["a", "b", "c", "d", "e"])    
+    disp.plot()
+    plt.title(f"{model} confusion matrix")
+    plt.savefig(f"{DATA_DIRECTORY}temp_validation_{model}.png")
+    plt.close()
+    
+    disp = ConfusionMatrixDisplay(cfn_dict[model], display_labels=["a", "b", "c", "d", "e"])    
+    disp.plot()
+    plt.title(f"{model} normalised confusion matrix")
+    plt.savefig(f"{DATA_DIRECTORY}temp_normalisedvalidation_{model}.png")
+    plt.close()
     
     
-im_h1 = list()
-im_h2 = list()
-
-temp_files = glob.glob(DATA_DIRECTORY + "temp_class_*")
-
-for index,image in enumerate(temp_files):
-    if index < 3:
-        im_h1.append(cv2.imread(image))
-    else:
-        im_h2.append(cv2.imread(image))
-        
-img_h1 = cv2.hconcat(im_h1)
-img_h2 = cv2.hconcat(im_h2)
-
-img = cv2.vconcat([img_h1, img_h2])
-
-cv2.imwrite(OUTPUT_DIRECTORY + "classification_analysis.png", img)
-
-for file in temp_files:
-    os.remove(file) 
-
-
+    
+hlp.collateImages(glob.glob(f"{DATA_DIRECTORY}/temp_validation_*.png"), "classification_validation.png")
+hlp.collateImages(glob.glob(f"{DATA_DIRECTORY}/temp_normalisedvalidation_*.png"), "classification_normalisedvalidation.png")
