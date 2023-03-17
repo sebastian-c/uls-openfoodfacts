@@ -8,6 +8,7 @@ Created on Wed Mar 15 14:21:03 2023
 DATA_DIRECTORY = "data/"
 OUTPUT_DIRECTORY = "output/"
 # %% Import libraries
+import os
 import glob
 
 # Plotting
@@ -160,22 +161,20 @@ nutriscore_clusters = pd.DataFrame(
 mb_crosstab = pd.crosstab(
     nutriscore_clusters["MiniBatch KMeans"], nutriscore_clusters["nutriscore"])
 
-# sb.heatmap(mb_crosstab, cmap = "Reds")
-# sb.clustermap(mb_crosstab, col_cluster = False, cmap = "Reds")
-# sb.clustermap(mb_crosstab, col_cluster = False, z_score = 1, cmap = "Reds")
-
 for algo in algo_dict.keys():
     mb_crosstab = pd.crosstab(
         nutriscore_clusters[algo], nutriscore_clusters["nutriscore"])
     sb.clustermap(mb_crosstab, col_cluster=False, z_score=1, cmap="Reds")
     plt.figtext(.5, .9, algo, fontsize = "xx-large")
     
-    plt.savefig(DATA_DIRECTORY + "temp_" + algo + ".png")
+    plt.savefig(DATA_DIRECTORY + "temp_clust_" + algo + ".png")
 
 im_h1 = list()
 im_h2 = list()
 
-for index,image in enumerate(glob.glob(DATA_DIRECTORY + "temp_*")):
+temp_files = glob.glob(DATA_DIRECTORY + "temp_clust_*")
+
+for index,image in enumerate(temp_files):
     if index < 5:
         im_h1.append(cv2.imread(image))
     else:
@@ -187,5 +186,9 @@ img_h2 = cv2.hconcat(im_h2)
 img = cv2.vconcat([img_h1, img_h2])
 
 cv2.imwrite(OUTPUT_DIRECTORY + "cluster_analysis.png", img)
+
+for file in temp_files:
+    os.remove(file) 
+
 
 #' So clearly, without training any models on the output data, we can see that nutriscores - at least the gap between ABC and DE form a natural grouping.
