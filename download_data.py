@@ -11,6 +11,7 @@ Created on Tue Mar 14 17:10:08 2023
 import os
 from zipfile import ZipFile
 import pandas as pd
+import numpy as np
 from pathlib import Path
 
 
@@ -51,5 +52,12 @@ def defineFoodCategory(series):
 
 raw_fooddata.loc[:,"food_category"] = raw_fooddata.categories_tags.apply(defineFoodCategory)
 food_data = raw_fooddata[raw_fooddata.food_category != "other"]
+
+#%% Remove obviously wrong data
+
+# Remove absurdly high salt content
+food_data.loc[food_data["salt_100g"] >2, "salt_100g"] = np.nan
+# 1g salt contains ~ 400mg sodium
+food_data.loc[food_data["sodium_100g"] > (2 * 0.4), "sodium_100g"] = np.nan
 
 food_data.to_csv(DATA_DIRECTORY + "food_data.csv", index = False)
