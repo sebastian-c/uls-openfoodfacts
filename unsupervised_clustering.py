@@ -5,6 +5,9 @@ Created on Wed Mar 15 14:21:03 2023
 @author: Sebastian
 """
 
+DATA_DIRECTORY = "data/"
+OUTPUT_DIRECTORY = "output/"
+# %% Import libraries
 import glob
 
 # Plotting
@@ -22,18 +25,6 @@ import pandas as pd
 from colorama import Fore, Style
 import datetime as time
 import warnings
-
-DATA_DIRECTORY = "data/"
-OUTPUT_DIRECTORY = "output/"
-# %% Import data
-# For suppressing warnings
-
-# For keeping track of which models have run
-
-# Machine learning
-#from sklearn.preprocessing import OrdinalEncoder
-
-# Plotting
 
 # %% Read in data
 food_data = pd.read_csv(DATA_DIRECTORY + "food_data.csv")
