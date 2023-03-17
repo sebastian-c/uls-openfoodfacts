@@ -19,6 +19,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
 
+import glob
+import os
+
+import cv2
 import matplotlib.pyplot as plt
 import seaborn as sb
 
@@ -77,9 +81,11 @@ for model_name, classifier in models:
     cv_df["model"] = model_name
     cv_df = cv_df.melt(id_vars=("fold", "model"), value_vars=("test_score", "train_score"), var_name="set", value_name="score")
     
+    
     sb.barplot(cv_df, x="fold", y="score", hue="set").set(title=f"Barplot of {model_name} cross-validation with {n_folds} folds")
     plt.ylim(0,1)
-    plt.savefig(DATA_DIRECTORY + "temp_" + model_name + ".png")
+    plt.savefig(DATA_DIRECTORY + "temp_class_" + model_name + ".png")
+    plt.close()
     
     print("-- Fitting model")
     classifier.fit(X_train, Y_train)
@@ -87,4 +93,27 @@ for model_name, classifier in models:
     print("-- Predicting")
     Y_pred = classifier.predict(X_test)
     cf_list[model_name] = (confusion_matrix(Y_test, Y_pred))
+    
+    
+im_h1 = list()
+im_h2 = list()
+
+temp_files = glob.glob(DATA_DIRECTORY + "temp_class_*")
+
+for index,image in enumerate(temp_files):
+    if index < 3:
+        im_h1.append(cv2.imread(image))
+    else:
+        im_h2.append(cv2.imread(image))
+        
+img_h1 = cv2.hconcat(im_h1)
+img_h2 = cv2.hconcat(im_h2)
+
+img = cv2.vconcat([img_h1, img_h2])
+
+cv2.imwrite(OUTPUT_DIRECTORY + "classification_analysis.png", img)
+
+for file in temp_files:
+    os.remove(file) 
+
 
