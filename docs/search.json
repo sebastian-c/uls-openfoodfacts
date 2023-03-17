@@ -1,0 +1,23 @@
+[
+  {
+    "objectID": "nutriscore_report.html",
+    "href": "nutriscore_report.html",
+    "title": "Reproducing Nutriscore: A Machine Learning approach",
+    "section": "",
+    "text": "We’d like to see if we can predict Nutriscore from foods using the OpenFoodFacts API. With a suite of clustering and classification models, we’d like to work backwards to see if we can work out what determines Nutriscore, then look at the actual calculation to see how close we got. While this exercise seems pointless in itself, the same technique could be used to work backwards to calculate closed source indices, such as those used by financial industries.\nWe’ll try a naïve approach to start with, using nutritional factors to predict nutriscore using an array of unsupervised clustering techniques to see if they form natural groups.\nAfterwards, we’ll use supervised classification techniques to create Nutriscore models. We’ll cross-validate them and check them against a validation set."
+  },
+  {
+    "objectID": "nutriscore_report.html#data-processing",
+    "href": "nutriscore_report.html#data-processing",
+    "title": "Reproducing Nutriscore: A Machine Learning approach",
+    "section": "Data processing",
+    "text": "Data processing\nNutriscore is one dimension available on OpenFoodFacts which also has nutritional data per 100g including1:1 We chose these nutrients as they’re the most common ones to find. Stepping out of these moves you from 90% of foods having them, to 90% without.\n\nEnergy (kJ)\nProtein\nSugar\nSodium\nSalt\nSaturated fat\nFat\nCarbohydrates\n\nIt also contains tags for all foods, making it easy to specify food types. Calculating the Nutriscore values for everything would be tedious and take a long time to analyse so we’re going to look at a few products:\n\nBreakfast cereals\nIced teas2\nBiscuits and cakes\n\n2 Iced tea varies a lot in sugar content as it’s often geared to the health market and so has options with either low sugar, or where some of the sugar has been replaced with artificial sweeteners.All of these foods are highly variable in sugar and fat content so it should give us an idea of what causes Nutriscore to change.\n\nThis document demonstrates the use of a number of these page layout features to produce an attractive and usable document inspired by the Tufte handout style and the use of Tufte’s styles in RMarkdown documents [@xie2018]. The Tufte handout style is a style that Edward Tufte uses in his books and handouts. Tufte’s style is known for its extensive use of sidenotes, tight integration of graphics with text, and well-set typography. Quarto3 supports most of the layout techniques that are used in the Tufte handout style for both HTML and LaTeX/PDF output.3 To learn more, you can read more about Quarto or visit Quarto’s Github repository.\n---\ntitle: \"An Example Using the Tufte Style\"\nauthor: \"John Smith\"\nformat:\n  html: default\n  pdf: default\n  \n# places footnotes and cited sources in the margin\n# other layout options (for example placing a \n# figure in the margin)  will be set on per element\n# in examples below\nreference-location: margin\n---\nThese layout features are designed with two important goals in mind:\n\nTo produce both PDF and HTML output with similar styles from the same Quarto document;\nTo provide simple syntax to write elements of the Tufte style such as side notes and margin figures. If you’d like a figure placed in the margin, just set the option fig-column: margin for your code chunk, and we will take care of the details for you4.\n\n4 You never need to think about \\begin{marginfigure} or <span class=\"marginfigure\">; the LaTeX and HTML code under the hood may be complicated, but you never need to learn or write such code.If you have any feature requests or find bugs in this capabilities, please do not hesitate to file them to https://github.com/quarto-dev/quarto-cli/issues."
+  },
+  {
+    "objectID": "nutriscore_report.html#margin-figures",
+    "href": "nutriscore_report.html#margin-figures",
+    "title": "Reproducing Nutriscore: A Machine Learning approach",
+    "section": "Margin Figures",
+    "text": "Margin Figures\nImages and graphics play an integral role in Tufte’s work. To place figures in the margin you can use the Quarto chunk option column: margin. For example:\n\nlibrary(ggplot2)\nmtcars2 <- mtcars\nmtcars2$am <- factor(\n  mtcars$am, labels = c('automatic', 'manual')\n)\nggplot(mtcars2, aes(hp, mpg, color = am)) +\n  geom_point() + geom_smooth() +\n  theme(legend.position = 'bottom')\n\n\n\n\n\nFigure 1: MPG vs horsepower, colored by transmission."
+  }
+]

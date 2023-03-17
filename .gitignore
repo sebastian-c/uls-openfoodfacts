@@ -8,4 +8,7 @@ raw_data/
 output/
 
 /*csv
+*.tex
+*.log
 
+/.quarto/
