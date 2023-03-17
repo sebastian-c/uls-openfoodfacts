@@ -1,7 +1,11 @@
 .spyproject/
+.Rproj.user
+*.Rproj
+__pycache__/
 
 data/
 raw_data/
 output/
 
 /*csv
+
