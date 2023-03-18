@@ -1,6 +1,7 @@
 .spyproject/
 .Rproj.user
 *.Rproj
+.Rhistory
 __pycache__/
 
 data/

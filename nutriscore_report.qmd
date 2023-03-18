@@ -95,7 +95,7 @@ There are some very clear patterns in the nutrient distributions of food categor
 
 ### Nutriscores
 
-Now that we've looked at the nutrients, we'll turn our attention to the nutriscores.
+Now that we've looked at the nutrients, we'll turn our attention to the Nutriscores.
 
 ![Nutriscore distribution in our data](output/nutriscore_distributions.png)
 
@@ -126,13 +126,14 @@ We chose 10 unsupervised clustering models:
 - BIRCH
 - Gaussian mixture
 
-Where possible, we limited them to 5 clusters. We then ran the models on our training data and compared them to our nutriscores. As there's no actual mapping between which cluster corresponds to which score, we've created heatmaps normalising the correspondances[^normal_clustmap] by nutriscore and with rows rearranged using hierarchical clustering.
+Where possible, we limited them to 5 clusters. We then ran the models on our training data and compared them to our nutriscores. As there's no actual mapping between which cluster corresponds to which score, we've created heatmaps normalising the correspondences[^normal_clustmap] by nutriscore and with rows rearranged using hierarchical clustering.
 
-[^normal_clustmap]: If you dont' normalise the correspondances, you'll end up with really low values for clusters with few members, even if the correspondances are good.
+[^normal_clustmap]: If you don't normalise the correspondences, you'll end up with really low values for clusters with few members, even if the correspondences are good.
 
 ## Results
 
 ![Clustering results](output/cluster_analysis.png)
+
 There's a lot to break down here. The models that performed poorly:
 
 
@@ -143,7 +144,7 @@ There's a lot to break down here. The models that performed poorly:
 
 These models tended to push everything into one cluster. It might be possible to fix this by adjusting the parameters.
 
-The other models seemed to able to cleanly split scores A and B from D and E. Affinity propagation is worth further investigation as while it has multiple clusters, it seems to have a cluster which identifies each Nutriscore
+The other models seemed to able to cleanly split scores A and B from D and E (Agglomerative with Ward, Spectral and Gaussian mixture). Affinity propagation is worth further investigation as while it has multiple clusters, it seems to have a cluster which identifies each Nutriscore.
 
 ## Conclusion
 
@@ -160,7 +161,7 @@ We looked at 6 classification models:
 - SVM with RBF
 - Ridge regression
 
-[^low_c]: We had to reduce the regularisation parameter (C) to 0.01 for both SVM models as the default value of 1 was taking hours to fit.
+[^low_c]: We had to reduce the regularisation parameter (C) to 0.01 for both SVM models as the default value of 1 was taking hours to fit. I'n retrspect maybe'm not sure if `max_iter` would have been a better choice.
 
 Each of these models was run with default parameters in `sklearn` and cross-validated using a 5-fold method. 20% of the dataset was randomly selected as a validation set in addition to the cross-validation. All 
 
@@ -177,22 +178,59 @@ K nearest neighbours, decision trees and random forests had near perfect perform
 ## Validation
 
 ![Unnormalised confusion matrices for each of the models predicting Nutriscore from nutritional information](output/classification_validation.png)
+
 A quick glance it seems that everything does a really good job except for RBF and Ridge which was somewhat expected given their cross-validation results. They don't predict very well for the small groups: Nutriscore A and B.
 
 Normalising these results will allow us to get a better idea of the prediction accuracy for these smaller groups.
 
 ![Normalised confusion matrices for each of the models predicting Nutriscore from nutritional information](output/classification_normalisedvalidation.png)
 
+With the normalisation of the confusion matrix, we can better see the prediction quality. Ridge and RBF are of course chronically underpredicting for the healthier classes. We can clearly see that decision trees and random forests give the best predictions of Nutriscore for all levels.
 
+# Linking back to the nature of Nutriscore
+
+We saw in the previous section that tree/decision models gave the best results, but why is that? Our theory is that these models best describe the underlying calculation. Our hypothesis is that the actual calculation relies on logical splits based on nutrients.
+
+The actual calculation is given by official sources in notoriously unhelpful documents such as the [password-protected spreadsheet](https://www.santepubliquefrance.fr/media/files/02-determinants-de-sante/nutrition-et-activite-physique/nutri-score/tableur-calcul-nutri-score-en) from Santé Publique France.
+
+Fortunately, some developers have taken it upon themselves to make more useful forms of it, in particular the developer of the [nutri-score js library](https://github.com/food-nutrients/nutri-score) who wrote out the calculation below.[^nutricode]
+
+![Code for nutriscore calculation](img/nutriscore_code.png)
+
+[^nutricode]: Taken from [`nutriScore.js` in `nutriscore`](https://github.com/food-nutrients/nutri-score/blob/master/nutriScore.js#L15-L22) that gives a full calculation of Nutriscore.
+
+Of major note is the last line containing the following equation:
+
+```javascript
+badNutrientsScore >= 11 && fruitScore < 5 ? badNutrientsScore - fiberScore - fruitScore : badNutrientsScore - goodNutrientsScore
+```
+
+Translated into something more Pythonic:
+
+```python
+
+if (badNutrientsScore >= 11 and fruitScore < 5):
+  nutriscore = badNutrientsScore - fiberScore - fruitScore
+else:
+  nutriscore = badNutrientsScore - goodNutrientsScore
+
+```
+
+The total calculation is more complex, but it's clear why decision tree-type models seem to do well.
 
 
 # Conclusions
 
-# Future improvements[^long_report]
+Nutriscore is reverse-engineerable. Clustering algorithms that do well at identifying Nutriscore groups are Agglomerative clustering (Ward), Spectral clustering and Gaussian Mixture. Classification algorithms that do a good job tend to be the decision tree models such as decision trees themselves and random forest models.
+
+# Future improvements
+
+There are of course a number of changes that could be made to improve this analysis[^long_report]:
 
 - Find more foods with Nutriscore A and B
 - Perform Feature importance to to more easily find which variables are more important
 - Normalising variables may have led to better results for sodium/salt
 - Searching variable space to optimise parameters
+- Create an easily-interpretable model of Nutriscore 
 
 [^long_report]: We _could_ have added more things - but aren't you tired of reading it already?
