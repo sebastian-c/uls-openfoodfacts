@@ -144,13 +144,18 @@ Given that these we found in an unsupervised manner, it's safe to say that Nutri
 
 We looked at 6 classification models:
 
-- 
+-   K nearest neighbours
+-   Random forest
+-   Decision tree
+-   Linear SVM[^low_c]
+-   SVM with RBF
+-   Ridge regression
+
+[]
 
 # Conclusions
 
 # Future improvements
 
-- Find more foods with Nutriscore A and B
-- Perform Feature importance to to more easily find which variables are more important
-- Do analysis which takes into account ordinal nature of Nutriscores
-
+-   Find more foods with Nutriscore A and B
+-   Perform Feature importance to to more easily find which variables are more important
