@@ -2,13 +2,23 @@
 title: "Reproducing Nutriscore: A Machine Learning approach"
 author: "Sebastian Campbell & Giridhar Ande"
 date: "`r Sys.Date()`"
+date-format: long
 format:
-    pdf: default
+    pdf: 
+      mainfont: Cambria
     html: 
       self-contained: true
 reference-location: margin
 citation-location: margin
 ---
+
+# Reading this document
+
+You may read this report in the format of your choosing:
+
+<!-- TO use the fontawesome icons, you'll need to use the library here: https://github.com/quarto-ext/fontawesome  -->
+
+[{{< fa file-code >}} HTML](https://sebastian-c.github.io/uls-openfoodfacts/nutriscore_report.html) | [{{< fa file-pdf >}} PDF](https://sebastian-c.github.io/uls-openfoodfacts/nutriscore_report.pdf) | [{{< fa brands github >}}GitHub](https://github.com/sebastian-c/uls-openfoodfacts)
 
 # Task description
 
@@ -22,9 +32,11 @@ Afterwards, we'll use supervised classification techniques to create Nutriscore 
 
 Our initial plan was to use python `openfoodfacts` library to pull in data directly from the API. Unfortunately, the API was unreliable and had frequent down periods. We opted to use a predownloaded  dump of the [OpenFoodFacts data from Kaggle](https://www.kaggle.com/datasets/openfoodfacts/world-food-facts). The kaggle data comes in the form of a zipped tab-separated file (.tsv). When extracted, it's about 1GB in size and contains 356 027 rows and 163 columns.
 
-## Data processing 
+## Processing 
 
-Nutriscore is one dimension available on OpenFoodFacts which also has nutritional data per 100g including[^chosen_nutrients]:
+In order to start using this data, we first had to filter and process it.
+
+Nutriscore is one dimension available on OpenFoodFacts among others, including nutritional data per 100g [^chosen_nutrients]:
 
 -   Energy (kJ)
 -   Protein
@@ -46,6 +58,25 @@ It also contains tags for all foods, making it easy to specify food types. Calcu
 All of these foods are highly variable in sugar and fat content so it should give us an idea of what causes Nutriscore to change.
 
 [^water]: Iced tea varies a lot in sugar content as it's often geared to the health market and so has options with either low sugar, or where some of the sugar has been replaced with artificial sweeteners.
+
+## Filtering
+
+Even after reducing our dataset, we still noticed some unusual values. In particular, we noticed some salt contents that were peculiarly high.[^hellopanda] We chose to remove all values with higher than 2% salt and the corresponding value for sodium.[^sodium]
+
+[^hellopanda]: Hello Panda may not be the healthiest treat, it's unlikely to contain [more than its own weight in salt](https://world.openfoodfacts.org/product/2000000046696/panda-biscuits).
+[^sodium]: Table salt is ~40% sodium, so our threshold was ($2\times0.4=0.8$)
+
+Given that the data we had retained was relatively complete, we opted to discard any rows with missing values rather than imputing. This caused a loss of ~15% of our data.
+
+## Exploration
+
+![](output/nutrient_food_distributions.png)
+
+# Unsupervised clustering
+
+The first question we wanted to answer was about 
+
+# Classification
 
 
 ---
