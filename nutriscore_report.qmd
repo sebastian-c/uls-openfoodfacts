@@ -3,6 +3,7 @@ title: "Reproducing Nutriscore: A Machine Learning approach"
 author: "Sebastian Campbell & Giridhar Ande"
 date: "`r Sys.Date()`"
 date-format: long
+search: false
 format:
     pdf: 
       mainfont: Cambria
@@ -51,7 +52,7 @@ Nutriscore is one dimension available on OpenFoodFacts among others, including n
 -   Fat
 -   Carbohydrates
 
-[^chosen_nutrients]: We chose these nutrients as they're the most common ones to find. Stepping out of these moves you from 90% of foods having them, to 90% without.
+[^chosen_nutrients]: We chose these nutrients as they're the most common ones to find in nutritional information. Stepping out of these moves you from 90% of foods having them, to 90% without.
 
 It also contains tags for all foods, making it easy to specify food types. Calculating the Nutriscore values for everything would be tedious and take a long time to analyse so we're going to look at a few products:
 
@@ -110,6 +111,8 @@ Splitting up the Nutriscores by category, we can see that iced teas are generall
 
 The first question we wanted to answer was "Do Nutriscores form natural groups?". While there is obviously an underlying model linking foods to Nutriscores, the question could be otherwise formulated: "If a machine creates clusters without knowledge of Nutriscores, will the clusters resemble Nutriscores?"
 
+## Method
+
 We chose 10 unsupervised clustering models:
 
 - MiniBatch KMeans
@@ -123,7 +126,11 @@ We chose 10 unsupervised clustering models:
 - BIRCH
 - Gaussian mixture
 
-Where possible, we limited them to 5 clusters. We then ran the models on our training data and compared them to our nutriscores. As there's no actual mapping between which cluster corresponds to which score, we've created heatmaps with rows rearranged using hierarchical clustering.
+Where possible, we limited them to 5 clusters. We then ran the models on our training data and compared them to our nutriscores. As there's no actual mapping between which cluster corresponds to which score, we've created heatmaps normalising the correspondances[^normal_clustmap] by nutriscore and with rows rearranged using hierarchical clustering.
+
+[^normal_clustmap]: If you dont' normalise the correspondances, you'll end up with really low values for clusters with few members, even if the correspondances are good.
+
+## Results
 
 ![Clustering results](output/cluster_analysis.png)
 There's a lot to break down here. The models that performed poorly:
@@ -138,24 +145,54 @@ These models tended to push everything into one cluster. It might be possible to
 
 The other models seemed to able to cleanly split scores A and B from D and E. Affinity propagation is worth further investigation as while it has multiple clusters, it seems to have a cluster which identifies each Nutriscore
 
+## Conclusion
+
 Given that these we found in an unsupervised manner, it's safe to say that Nutriscores are natural groupings found in the data.
 
 # Classification
 
 We looked at 6 classification models:
 
--   K nearest neighbours
--   Random forest
--   Decision tree
--   Linear SVM[^low_c]
--   SVM with RBF
--   Ridge regression
+- K nearest neighbours
+- Random forest
+- Decision tree
+- Linear SVM[^low_c]
+- SVM with RBF
+- Ridge regression
 
-[]
+[^low_c]: We had to reduce the regularisation parameter (C) to 0.01 for both SVM models as the default value of 1 was taking hours to fit.
+
+Each of these models was run with default parameters in `sklearn` and cross-validated using a 5-fold method. 20% of the dataset was randomly selected as a validation set in addition to the cross-validation. All 
+
+## Cross-validation results
+
+![Cross-validation of all classification models using 5 folds](output/classification_analysis.png)
+
+The SVM models performed particularly poorly - both in their training and during the cross-validation. This is almost certainly because we had to cripple them with low regularisation parameters or else they simply took too long to run.
+
+Ridge regression is notable for having very similar values for training and cross-validation. There's no overfitting, but its overall performance with its current parameters is too low to consider.
+
+K nearest neighbours, decision trees and random forests had near perfect performance on their training sets and good performance in cross validation. The winner is clearly *random forest*, having the highest cross-validation scores.
+
+## Validation
+
+![Unnormalised confusion matrices for each of the models predicting Nutriscore from nutritional information](output/classification_validation.png)
+A quick glance it seems that everything does a really good job except for RBF and Ridge which was somewhat expected given their cross-validation results. They don't predict very well for the small groups: Nutriscore A and B.
+
+Normalising these results will allow us to get a better idea of the prediction accuracy for these smaller groups.
+
+![Normalised confusion matrices for each of the models predicting Nutriscore from nutritional information](output/classification_normalisedvalidation.png)
+
+
+
 
 # Conclusions
 
-# Future improvements
+# Future improvements[^long_report]
 
--   Find more foods with Nutriscore A and B
--   Perform Feature importance to to more easily find which variables are more important
+- Find more foods with Nutriscore A and B
+- Perform Feature importance to to more easily find which variables are more important
+- Normalising variables may have led to better results for sodium/salt
+- Searching variable space to optimise parameters
+
+[^long_report]: We _could_ have added more things - but aren't you tired of reading it already?
