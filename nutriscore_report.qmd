@@ -161,7 +161,7 @@ We looked at 6 classification models:
 - SVM with RBF
 - Ridge regression
 
-[^low_c]: We had to reduce the regularisation parameter (C) to 0.01 for both SVM models as the default value of 1 was taking hours to fit. I'n retrspect maybe'm not sure if `max_iter` would have been a better choice.
+[^low_c]: We had to reduce the regularisation parameter (C) to 0.01 for both SVM models as the default value of 1 was taking hours to fit. In retrospect perhaps `max_iter` would have been a better choice.
 
 Each of these models was run with default parameters in `sklearn` and cross-validated using a 5-fold method. 20% of the dataset was randomly selected as a validation set in addition to the cross-validation. All 
 
@@ -199,11 +199,15 @@ Fortunately, some developers have taken it upon themselves to make more useful f
 
 [^nutricode]: Taken from [`nutriScore.js` in `nutriscore`](https://github.com/food-nutrients/nutri-score/blob/master/nutriScore.js#L15-L22) that gives a full calculation of Nutriscore.
 
-Of major note is the last line containing the following equation:
+Of major note is the last line containing the following equation[^code_folding]:
 
 ```javascript
-badNutrientsScore >= 11 && fruitScore < 5 ? badNutrientsScore - fiberScore - fruitScore : badNutrientsScore - goodNutrientsScore
+badNutrientsScore >= 11 && fruitScore < 5 ? 
+  badNutrientsScore - fiberScore - fruitScore : 
+    badNutrientsScore - goodNutrientsScore
 ```
+
+[^code_folding]: I'm really bad at javascript so I have no idea if my newlines I needed to make it fit the page made it invalid
 
 Translated into something more Pythonic:
 
