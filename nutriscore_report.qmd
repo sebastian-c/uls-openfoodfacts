@@ -18,7 +18,7 @@ You may read this report in the format of your choosing:
 
 <!-- TO use the fontawesome icons, you'll need to use the library here: https://github.com/quarto-ext/fontawesome  -->
 
-[{{< fa file-code >}} HTML](https://sebastian-c.github.io/uls-openfoodfacts/Nutriscore_report.html) | [{{< fa file-pdf >}} PDF](https://sebastian-c.github.io/uls-openfoodfacts/Nutriscore_report.pdf) | [{{< fa brands github >}} GitHub](https://github.com/sebastian-c/uls-openfoodfacts)
+[{{< fa file-code >}} HTML](https://sebastian-c.github.io/uls-openfoodfacts/nutriscore_report.html) | [{{< fa file-pdf >}} PDF](https://sebastian-c.github.io/uls-openfoodfacts/nutriscore_report.pdf) | [{{< fa brands github >}} GitHub](https://github.com/sebastian-c/uls-openfoodfacts)
 
 # Task description
 
@@ -110,7 +110,41 @@ Splitting up the Nutriscores by category, we can see that iced teas are generall
 
 The first question we wanted to answer was "Do Nutriscores form natural groups?". While there is obviously an underlying model linking foods to Nutriscores, the question could be otherwise formulated: "If a machine creates clusters without knowledge of Nutriscores, will the clusters resemble Nutriscores?"
 
+We chose 10 unsupervised clustering models:
+
+- MiniBatch KMeans
+- Affinity propagation
+- MeanShift
+- Spectral clustering
+- Agglomerative clustering (Ward linkage)
+- Agglomerative clustering (average linkage)
+- DBSCAN
+- OPTICS
+- BIRCH
+- Gaussian mixture
+
+Where possible, we limited them to 5 clusters. We then ran the models on our training data and compared them to our nutriscores. As there's no actual mapping between which cluster corresponds to which score, we've created heatmaps with rows rearranged using hierarchical clustering.
+
+![Clustering results](output/cluster_analysis.png)
+There's a lot to break down here. The models that performed poorly:
+
+
+- Agglomerative clustering (average linkage)
+- DBSCAN
+- MeanShift
+- OPTICS
+
+These models tended to push everything into one cluster. It might be possible to fix this by adjusting the parameters.
+
+The other models seemed to able to cleanly split scores A and B from D and E. Affinity propagation is worth further investigation as while it has multiple clusters, it seems to have a cluster which identifies each Nutriscore
+
+Given that these we found in an unsupervised manner, it's safe to say that Nutriscores are natural groupings found in the data.
+
 # Classification
+
+We looked at 6 classification models:
+
+- 
 
 # Conclusions
 
