@@ -56,7 +56,7 @@ X.hist(sharey = False, sharex = False)
 plt.tight_layout(w_pad = 0.01, h_pad = 0.01, pad = 0.01)
 plt.gcf().set_size_inches(15,7.5)
 plt.savefig(OUTPUT_DIRECTORY + "nutrient_distributions.png", dpi = 300)
-g.map(sb.histplot, "value", bins=30)
+
 # nutriscore plot
 Y.hist()
 plt.savefig(OUTPUT_DIRECTORY + "nutriscore_distributions.png", dpi = 300)
