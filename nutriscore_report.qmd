@@ -22,7 +22,7 @@ You may read this report in the format of your choosing:
 
 # Task description
 
-We'd like to see if we can predict Nutriscore from foods using the [OpenFoodFacts API](https://wiki.openfoodfacts.org/Open_Food_Facts_Search_API_Version_2). With a suite of clustering and classification models, we'd like to work backwards to see if we can work out what determines Nutriscore, then look at the actual calculation to see how close we got. While this exercise seems pointless in itself, the same technique could be used to work backwards to calculate closed source indices, such as those used by financial industries.
+We'd like to see if we can predict Nutriscore from foods using the [OpenFoodFacts API](https://wiki.openfoodfacts.org/Open_Food_Facts_Search_API_Version_2). With a suite of clustering and classification models, we'd like to work backwards to see if we can work out what determines Nutriscore. While this exercise seems pointless in itself, the same technique could be used to work backwards to calculate closed source indices, such as those used by financial industries.
 
 
 
