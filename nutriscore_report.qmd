@@ -18,13 +18,17 @@ You may read this report in the format of your choosing:
 
 <!-- TO use the fontawesome icons, you'll need to use the library here: https://github.com/quarto-ext/fontawesome  -->
 
-[{{< fa file-code >}} HTML](https://sebastian-c.github.io/uls-openfoodfacts/nutriscore_report.html) | [{{< fa file-pdf >}} PDF](https://sebastian-c.github.io/uls-openfoodfacts/nutriscore_report.pdf) | [{{< fa brands github >}}GitHub](https://github.com/sebastian-c/uls-openfoodfacts)
+[{{< fa file-code >}} HTML](https://sebastian-c.github.io/uls-openfoodfacts/Nutriscore_report.html) | [{{< fa file-pdf >}} PDF](https://sebastian-c.github.io/uls-openfoodfacts/Nutriscore_report.pdf) | [{{< fa brands github >}} GitHub](https://github.com/sebastian-c/uls-openfoodfacts)
 
 # Task description
 
 We'd like to see if we can predict Nutriscore from foods using the [OpenFoodFacts API](https://wiki.openfoodfacts.org/Open_Food_Facts_Search_API_Version_2). With a suite of clustering and classification models, we'd like to work backwards to see if we can work out what determines Nutriscore, then look at the actual calculation to see how close we got. While this exercise seems pointless in itself, the same technique could be used to work backwards to calculate closed source indices, such as those used by financial industries.
 
-We'll try a naïve approach to start with, using nutritional factors to predict nutriscore using an array of unsupervised clustering techniques to see if they form natural groups.
+
+
+We'll try a naïve approach to start with, using nutritional factors to predict Nutriscore using an array of unsupervised clustering techniques to see if they form natural groups. [^unsup_nutriscore]
+
+[^unsup_nutriscore]: If these groups exists, I suspect this is how the index was created in the first place.
 
 Afterwards, we'll use supervised classification techniques to create Nutriscore models. We'll cross-validate them and check them against a validation set.
 
@@ -70,64 +74,49 @@ Given that the data we had retained was relatively complete, we opted to discard
 
 ## Exploration
 
-![](output/nutrient_food_distributions.png)
+### Nutrients
+
+The first thing to look at when you have a new dataset is distribution. Let's look at overall distributions of each of our dependent variables.
+
+![Nutrient distributions of biscuits, iced tea and breakfast cereals](output/nutrient_distributions.png)
+
+A number of these have large outliers, but after sodium and salt were taken out in the processing step, none of them seem too terrible.[^sat_fats]
+
+[^sat_fats]: Turns out the reason there's a huge outlier here is the presence of some dried coconut that counts as a biscuit. We didn't remove it as there are a number of biscuits from Brittany not too far away with astonishing levels of saturated fats.
+
+The next stage of describing out nutrients would be to split these by type of food.
+
+![Nutrient distributions of a subset of food categories](output/nutrient_food_distributions.png) 
+
+There are some very clear patterns in the nutrient distributions of food category.[^freex_nutrient] Iced tea behaves quite differently to the others as it has virtually no nutrients other than sugar and energy. Biscuits seem to have the most normally distributed nutrients, while cereals seem to have a number of healthy ones with low sodium and fat but a large spread with more of those nutrients.
+
+[^freex_nutrient]: Please note that the x-axes are free. I wasn't able to fix it per column and it would have been pointless to fit it for the whole grid.
+
+### Nutriscores
+
+Now that we've looked at the nutrients, we'll turn our attention to the nutriscores.
+
+![Nutriscore distribution in our data](output/nutriscore_distributions.png)
+
+Out data is mostly unhealthy food, it would seem. We have a lot of foods with scores of D and E, but not so many with scores of A and B. Given that most of the data in OpenFoodFacts is processed food, this isn't surprising - but our choices of category are certainly not helping our cause.
+
+![Nutriscore distribution by food](output/nutriscore_food_distributions.png)
+
+Splitting up the Nutriscores by category, we can see that iced teas are generally unhealthy, with not a single one getting a score of A. Biscuits and cakes show an expected distribution as do breakfast cereals as there's a lacuna between All-Bran and Coco Pops.[^cereal_nutriscore]
+
+[^cereal_nutriscore]: I suspect that the reason that there are so many Cs are unhealthy cereals adding fibre to their cereals to get to the first "healthy-ish" tier.
 
 # Unsupervised clustering
 
-The first question we wanted to answer was about 
+The first question we wanted to answer was "Do Nutriscores form natural groups?". While there is obviously an underlying model linking foods to Nutriscores, the question could be otherwise formulated: "If a machine creates clusters without knowledge of Nutriscores, will the clusters resemble Nutriscores?"
 
 # Classification
 
+# Conclusions
 
----
+# Future improvements
 
+- Find more foods with Nutriscore A and B
+- Perform Feature importance to to more easily find which variables are more important
+- Do analysis which takes into account ordinal nature of Nutriscores
 
-This document demonstrates the use of a number of these page layout features to produce an attractive and usable document inspired by the Tufte handout style and the use of Tufte's styles in RMarkdown documents [@xie2018]. The Tufte handout style is a style that Edward Tufte uses in his books and handouts. Tufte's style is known for its extensive use of sidenotes, tight integration of graphics with text, and well-set typography. Quarto[^1] supports most of the layout techniques that are used in the Tufte handout style for both HTML and LaTeX/PDF output.
-
-[^1]: To learn more, you can read more about [Quarto](https://www.quarto.org) or visit [Quarto's Github repository](https://www.github.com/quarto-dev/quarto-cli).
-
-``` yaml
----
-title: "An Example Using the Tufte Style"
-author: "John Smith"
-format:
-  html: default
-  pdf: default
-  
-# places footnotes and cited sources in the margin
-# other layout options (for example placing a 
-# figure in the margin)  will be set on per element
-# in examples below
-reference-location: margin
----
-```
-
-These layout features are designed with two important goals in mind:
-
-1.  To produce both PDF and HTML output with similar styles from the same Quarto document;
-2.  To provide simple syntax to write elements of the Tufte style such as side notes and margin figures. If you'd like a figure placed in the margin, just set the option `fig-column: margin` for your code chunk, and we will take care of the details for you[^2].
-
-[^2]: You never need to think about `\begin{marginfigure}` or `<span class="marginfigure">`; the LaTeX and HTML code under the hood may be complicated, but you never need to learn or write such code.
-
-If you have any feature requests or find bugs in this capabilities, please do not hesitate to file them to [https://github.com/quarto-dev/quarto-cli/issues](https://github.com/rstudio/tufte/issues){.uri}.
-
-# Figures
-
-## Margin Figures
-
-Images and graphics play an integral role in Tufte's work. To place figures in the margin you can use the **Quarto** chunk option `column: margin`. For example:
-
-```{r}
-#| label: fig-margin
-#| fig-cap: "MPG vs horsepower, colored by transmission."
-#| column: margin
-#| message: false
-library(ggplot2)
-mtcars2 <- mtcars
-mtcars2$am <- factor(
-  mtcars$am, labels = c('automatic', 'manual')
-)
-ggplot(mtcars2, aes(hp, mpg, color = am)) +
-  geom_point() + geom_smooth() +
-  theme(legend.position = 'bottom')
-```
