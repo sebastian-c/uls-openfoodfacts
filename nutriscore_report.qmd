@@ -207,7 +207,7 @@ badNutrientsScore >= 11 && fruitScore < 5 ?
     badNutrientsScore - goodNutrientsScore
 ```
 
-[^code_folding]: I'm really bad at javascript so I have no idea if my newlines I needed to make it fit the page made it invalid
+[^code_folding]: I'm really bad at javascript so I have no idea if my newlines I needed to make it fit the page made it invalid js.
 
 Translated into something more Pythonic:
 
